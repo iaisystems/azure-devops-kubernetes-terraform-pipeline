@@ -1,0 +1,20 @@
+{
+  "name": "com.example.ipcs_plugin",
+  "version": "1.0",
+  "type": "python",
+  "metrics": [
+    {
+      "key": "custom:sharedMemorySegments",
+      "unit": "Count",
+      "displayname": "Shared Memory Segments"
+    },
+    {
+      "key": "custom:sharedMemoryTotalSize",
+      "unit": "Bytes",
+      "displayname": "Total Shared Memory Size"
+    }
+  ],
+  "processType": "singleton",
+  "interval": 60,
+  "pythonClassName": "IpcsPlugin"
+}
