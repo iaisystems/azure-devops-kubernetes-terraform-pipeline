@@ -1,0 +1,12 @@
+def send_metrics(ipc_data):
+    # Example for shared memory
+    for segment in ipc_data['shared_memory']:
+        # Send each data point under custom.sharedMemorySegments.ts
+        send_dynatrace_metric("custom.sharedMemorySegments.ts", segment['bytes'])
+
+    # Similarly for message queues and semaphores
+    for queue in ipc_data['message_queues']:
+        send_dynatrace_metric("custom.messageQueues.ts", queue['bytes'])
+
+    for semaphore in ipc_data['semaphores']:
+        send_dynatrace_metric("custom.semaphores.ts", semaphore['nsems'])

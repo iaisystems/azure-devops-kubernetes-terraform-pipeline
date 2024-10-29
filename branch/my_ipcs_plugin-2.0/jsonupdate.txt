@@ -1,0 +1,19 @@
+{
+    "metrics": [
+        {
+            "timeseries": "custom.sharedMemorySegments.ts",
+            "unit": "Bytes",
+            "displayname": "Shared Memory Segments"
+        },
+        {
+            "timeseries": "custom.messageQueues.ts",
+            "unit": "Count",
+            "displayname": "Message Queues"
+        },
+        {
+            "timeseries": "custom.semaphores.ts",
+            "unit": "Count",
+            "displayname": "Semaphores"
+        }
+    ]
+}

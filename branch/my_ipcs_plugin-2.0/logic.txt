@@ -1,0 +1,22 @@
+// Run `ipcs -m` and capture output
+$output = shell_exec('ipcs -m');
+
+// Split output by lines
+$lines = explode("\n", trim($output));
+
+// Skip the first line (header), and parse the rest
+$shared_memory_data = [];
+for ($i = 1; $i < count($lines); $i++) {
+    $columns = preg_split('/\s+/', $lines[$i]);
+    $shared_memory_data[] = [
+        'key' => $columns[0],
+        'shmid' => $columns[1],
+        'owner' => $columns[2],
+        'perms' => $columns[3],
+        'bytes' => $columns[4],
+        'nattch' => $columns[5],
+        'status' => $columns[6] ?? ''
+    ];
+}
+
+error_log("Parsed Shared Memory Data: " . print_r($shared_memory_data, true));
