@@ -1,0 +1,22 @@
+{
+  "name": "custom.shared.memory.plugin",
+  "version": "1.0",
+  "type": "python",
+  "description": "Plugin to monitor shared memory metrics using ipcs command",
+  "metrics": [
+    {
+      "key": "shared_memory.total_segments",
+      "type": "gauge",
+      "unit": "Count",
+      "displayname": "Total Shared Memory Segments"
+    },
+    {
+      "key": "shared_memory.total_memory_bytes",
+      "type": "gauge",
+      "unit": "Bytes",
+      "displayname": "Total Shared Memory in Bytes"
+    }
+  ],
+  "remote": false,
+  "interval": 60
+}
