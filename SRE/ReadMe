@@ -1,0 +1,18 @@
+Challenges for Practice
+Challenge 1: Multi-Service Metrics
+
+Create a dataset with CPU, memory, and disk usage for multiple services.
+Aggregate metrics and find the most resource-intensive service.
+Challenge 2: Log Correlation
+
+Analyze logs from multiple servers and correlate downtime events with error spikes.
+Challenge 3: Anomaly Detection
+
+Use a rolling average or exponentially weighted moving average (EWMA) to detect anomalies in time-series data.
+Challenge 4: SLA Analysis
+
+Simulate a dataset with latency and availability data for multiple endpoints.
+Calculate SLA compliance for each endpoint.
+Challenge 5: Incident Analysis
+
+Combine logs and monitoring metrics to identify the root cause of a simulated incident.
