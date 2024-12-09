@@ -1,0 +1,35 @@
+
+# KT Document: Example Prompt Engineering Script
+
+## Purpose
+This script provides an example implementation of prompt engineering for interacting with AOAI APIs (Azure OpenAI APIs).
+
+## Key Components
+
+### **Function: `generate_prompt(query)`**
+- **Purpose:** Creates a structured prompt for the language model based on user input.
+- **Parameters:**
+  - `query`: User's question or input.
+- **Returns:** A structured string prompt to be used in API requests.
+
+### **Function: `call_aoai_api(prompt)`**
+- **Purpose:** Sends the structured prompt to AOAI API and retrieves the response.
+- **Parameters:**
+  - `prompt`: Structured prompt string.
+- **Returns:** Response from the AOAI API.
+
+### **Function: `process_response(api_response)`**
+- **Purpose:** Processes the raw response from the AOAI API to extract meaningful information.
+- **Parameters:**
+  - `api_response`: Raw response object or string from the API.
+- **Returns:** Processed information for user consumption.
+
+## Usage Instructions
+1. Use `generate_prompt` to create a query for the language model.
+2. Call `call_aoai_api` to send the prompt and retrieve the response.
+3. Use `process_response` to parse the results.
+
+## Dependencies
+- Python modules: `requests`, `json`.
+- External APIs: Azure OpenAI APIs (AOAI).
+

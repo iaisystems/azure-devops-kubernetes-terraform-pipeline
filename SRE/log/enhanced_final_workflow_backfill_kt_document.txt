@@ -1,0 +1,63 @@
+
+# KT Document: Final Workflow Backfill Script
+
+## Purpose
+This script is designed to process workflows, identify gaps in their execution history, and create backfill tasks for missing workflows.
+
+## Key Components
+
+### **Class: `LeapBackfill`**
+- **Purpose:** Handles the identification and processing of missing workflows.
+
+#### **`__init__`**
+- Initializes the `LeapBackfill` instance.
+- **Parameters:**
+  - `resource_id`: Unique identifier for a resource.
+  - `build`: Boolean to trigger a build process.
+  - `elk_day2_data`: Workflow data for analysis.
+  - `workflow_in_optimus_history`: Workflow history data.
+  - `ordertracking`: Tracks orders related to workflows.
+  - `foundation_model`: Optional foundation model for workflow data.
+
+#### **`get_start_task_time_in_task_history`**
+- **Purpose:** Retrieves the start time of a task in workflow history.
+- **Parameters:**
+  - `workflow_start_end`: Dictionary containing workflow metadata, including start and end times.
+- **Process:** Converts ISO 8601 strings to milliseconds and retrieves the task with a `CREATED` status.
+
+#### **`get_task_success_end_time_in_task_history`**
+- **Purpose:** Retrieves the end time of a successful task in workflow history.
+- **Parameters:**
+  - `workflow_start_end`: Dictionary containing workflow metadata, including start and end times.
+- **Process:** Converts ISO 8601 strings to milliseconds and retrieves the task with a `SUCCESS` status.
+
+#### **`find_leapp_missing_and_backfill`**
+- **Purpose:** Identifies missing workflows and creates backfill tasks for them.
+- **Parameters:**
+  - `workflow_start_end_list`: List of workflows with start and end metadata.
+- **Process:** Iterates through workflows, retrieves start and end tasks, and creates backfill tasks for gaps.
+
+---
+
+### **Class: `Day2IssueForBackfill`**
+- **Purpose:** Represents a backfill task created to resolve workflow issues.
+
+#### **`__init__`**
+- Initializes the `Day2IssueForBackfill` instance.
+- **Parameters:**
+  - `resource_id`: Unique identifier for the resource.
+  - `build`: Boolean to indicate whether to trigger a build process.
+  - `wfstatus`: Current status of the workflow.
+  - `start_task`: The start task of the workflow.
+  - `end_task`: The end task of the workflow.
+
+#### **`save`**
+- **Purpose:** Saves the backfill issue to a database or model.
+- **Process:** Logs and executes the save operation.
+
+## Usage Instructions
+1. Instantiate the `LeapBackfill` class with appropriate parameters.
+2. Use `find_leapp_missing_and_backfill` to process workflows and resolve missing tasks.
+
+## Dependencies
+- Python modules: `logging`, `datetime`, `dateutil`.

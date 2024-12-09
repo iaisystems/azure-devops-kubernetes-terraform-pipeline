@@ -1,0 +1,61 @@
+
+# KT Document: Luigi Soft Failure Handling Script
+
+## Purpose
+This script provides a mechanism to allow Luigi tasks to fail softly, enabling smoother workflow management without abrupt failures.
+
+## Key Components
+
+### **Class: `dataloader_softly_failing`**
+- **Purpose:** A decorator to allow Luigi tasks to fail gracefully.
+- **Attributes:**
+  - `catch_all`: Catches all exceptions during task execution.
+  - `propagate`: Propagates failures when a dependency fails softly.
+  - `output_dir`: Directory for saving failure logs.
+
+#### **`__init__`**
+- Initializes the decorator with parameters.
+- **Parameters:**
+  - `catch_all`: Boolean to handle all exceptions.
+  - `propagate`: Boolean to propagate failures.
+  - `output_dir`: Directory path for storing failure logs.
+
+#### **`__call__`**
+- Wraps the task and handles failure gracefully.
+
+#### **`fail_softly`**
+- Logs the failure or exception details into a file.
+
+#### **`failed_softly`**
+- Checks whether the task has failed softly by verifying the existence of a log file.
+
+#### **`output`**
+- Returns the location of the failure log or task output.
+
+---
+
+### **Class: `SoftFailureTarget`**
+- **Purpose:** Handles the storage and management of failure logs.
+- **Attributes:**
+  - `task_id`: Identifier for the task.
+  - `res_id`: Resource ID associated with the task.
+  - `output_dir`: Directory for storing logs.
+
+#### **`_propagated_failure_message_part`**
+- Constructs a detailed failure message by appending upstream failure logs.
+
+#### **`_propagated`**
+- Checks if a failure message is propagated.
+
+#### **`_content`**
+- Reads the content of the failure log file.
+
+## Usage Instructions
+1. Use the `@dataloader_softly_failing` decorator on Luigi tasks.
+2. Configure the decorator with parameters (`catch_all`, `propagate`, `output_dir`) as required.
+3. Implement task logic in the `run()` method.
+
+## Dependencies
+- Python modules: `luigi`, `traceback`, `os`.
+- Custom modules: `luigi_soft_failures.config`, `luigi_soft_failures.utils`.
+

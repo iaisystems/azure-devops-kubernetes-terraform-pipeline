@@ -1,0 +1,28 @@
+
+# KT Document: Optimus Workflow History Script
+
+## Purpose
+This script retrieves workflow history from Optimus API, processes it to extract initiated workflows, 
+and generates a list of workflow start and end times for further analysis.
+
+## Key Components
+
+1. **Class: `OptimusWorkflowHistory`**
+   - Handles sorting, filtering, and extracting workflow data from the Optimus API response.
+
+2. **Functions**
+   - `__init__(self, input, res_id)`: Initializes the class with the raw data and resource ID.
+   - `get_initiated_workflows(self)`: Retrieves workflows in the 'INITIATED' state.
+   - `generate_optimus_history_start_end_time_list(self)`: Generates start and end times for workflows.
+
+3. **Main Function**
+   - Fetches data from the Optimus API using authentication.
+   - Initializes the `OptimusWorkflowHistory` class and retrieves initiated workflows.
+
+## Usage Instructions
+1. Update API credentials and base URLs in the `main` function.
+2. Use the `OptimusWorkflowHistory` class to filter and sort workflows.
+3. Execute the script and analyze results.
+
+## Dependencies
+- Python modules: `reverie.utils`, `requests`, `datetime_utils`.

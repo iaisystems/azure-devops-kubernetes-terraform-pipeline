@@ -1,0 +1,51 @@
+
+# KT Document: Ansible Error Handling Script
+
+## Purpose
+This script handles error detection and processing for Ansible jobs using logs retrieved from an external system.
+
+## Key Components
+
+### **Function: `get_tower_url(description)`**
+- **Purpose:** Extracts the Ansible Tower URL from a given description string.
+- **Parameters:**
+  - `description`: String containing a possible Tower URL.
+- **Returns:** The extracted URL string or `None` if no URL is found.
+
+### **Function: `get_ansible_error_from_tower(description)`**
+- **Purpose:** Retrieves Ansible errors from Tower logs.
+- **Parameters:**
+  - `description`: String describing the Tower task.
+- **Process:**
+  - Extracts the URL using `get_tower_url`.
+  - Sends a GET request to the URL to fetch logs.
+  - Parses logs to extract error details.
+- **Returns:** Parsed error details.
+
+### **Function: `parse_tower_error(error_log)`**
+- **Purpose:** Parses the error log to extract fatal error messages.
+- **Parameters:**
+  - `error_log`: Log data retrieved from the Tower.
+- **Returns:** The first fatal error message.
+
+### **Function: `is_ansible_error(description)`**
+- **Purpose:** Determines whether the description contains an Ansible error.
+- **Parameters:**
+  - `description`: String describing a task or job.
+- **Returns:** The error job number if found, else `None`.
+
+### **Function: `parse_elk_errorlog(errors)`**
+- **Purpose:** Parses ELK logs for fatal error messages.
+- **Parameters:**
+  - `errors`: ELK log data.
+- **Returns:** The first fatal error message.
+
+## Usage Instructions
+1. Use `get_tower_url` to extract URLs from task descriptions.
+2. Call `get_ansible_error_from_tower` to retrieve and process Tower logs.
+3. Use `parse_tower_error` or `parse_elk_errorlog` to extract error messages from logs.
+
+## Dependencies
+- Python modules: `logging`, `requests`.
+- External APIs: Ansible Tower API.
+

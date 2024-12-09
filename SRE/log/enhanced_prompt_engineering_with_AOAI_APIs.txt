@@ -1,0 +1,35 @@
+
+# KT Document: Prompt Engineering with AOAI APIs
+
+## Purpose
+This script demonstrates how to use Azure OpenAI APIs (AOAI) for generating responses using structured prompts.
+
+## Key Components
+
+### **Function: `create_prompt(user_input)`**
+- **Purpose:** Creates a structured prompt for the OpenAI language model.
+- **Parameters:**
+  - `user_input`: Text input from the user.
+- **Returns:** A structured prompt string.
+
+### **Function: `send_to_aoai_api(prompt)`**
+- **Purpose:** Sends the prompt to AOAI APIs and retrieves the generated response.
+- **Parameters:**
+  - `prompt`: Structured prompt string.
+- **Returns:** Response from the AOAI API.
+
+### **Function: `process_aoai_response(response)`**
+- **Purpose:** Processes the raw response from AOAI APIs to extract meaningful results.
+- **Parameters:**
+  - `response`: API response data.
+- **Returns:** Processed output for the user.
+
+## Usage Instructions
+1. Use `create_prompt` to generate a structured query.
+2. Use `send_to_aoai_api` to send the query to AOAI APIs.
+3. Use `process_aoai_response` to interpret the response.
+
+## Dependencies
+- Python modules: `requests`, `json`.
+- External APIs: Azure OpenAI API.
+

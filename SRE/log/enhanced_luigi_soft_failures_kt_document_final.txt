@@ -1,0 +1,59 @@
+
+# KT Document: Luigi Soft Failures Handling Script (Final)
+
+## Purpose
+This script provides a mechanism to allow Luigi tasks to fail softly, enabling smoother workflow management by preventing abrupt failures.
+
+## Key Components
+
+### **Class: `dataloader_softly_failing`**
+- **Purpose:** Decorator to handle Luigi task failures gracefully.
+- **Attributes:**
+  - `catch_all`: Catch all exceptions during execution.
+  - `propagate`: Propagate soft failures to downstream tasks.
+  - `output_dir`: Directory for storing failure logs.
+
+#### **`__init__`**
+- Initializes the decorator with parameters.
+- **Parameters:**
+  - `catch_all`: Boolean for exception handling.
+  - `propagate`: Boolean for propagating failures.
+  - `output_dir`: Directory for saving failure logs.
+
+#### **`fail_softly(exception_or_msg)`**
+- **Purpose:** Logs failure details into a file.
+- **Parameters:**
+  - `exception_or_msg`: Exception or message to log.
+
+#### **`failed_softly()`**
+- **Purpose:** Checks whether the task has failed softly.
+- **Returns:** Boolean indicating if a failure log exists.
+
+#### **`output(failed=False)`**
+- **Purpose:** Returns the location of the failure log or task output.
+
+---
+
+### **Class: `SoftFailureTarget`**
+- **Purpose:** Handles soft failure logs and their propagation.
+- **Attributes:**
+  - `task_id`: Identifier for the task.
+  - `res_id`: Resource ID for the task.
+  - `output_dir`: Directory for storing logs.
+
+#### **`_propagated_failure_message_part()`**
+- **Purpose:** Appends upstream failure messages to logs.
+
+#### **`_propagated()`**
+- **Purpose:** Checks if a failure message is propagated.
+
+#### **`_content()`**
+- **Purpose:** Reads the failure log content.
+
+## Usage Instructions
+1. Use `@dataloader_softly_failing` as a decorator for Luigi tasks.
+2. Implement task logic inside the `run()` method.
+3. Handle failures using the `fail_softly` method.
+
+## Dependencies
+- Python modules: `luigi`, `traceback`, `os`.

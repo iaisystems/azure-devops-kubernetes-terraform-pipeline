@@ -1,0 +1,34 @@
+
+# KT Document: Tower and ELK Log Parsing Script
+
+## Purpose
+This script extracts information from Ansible Tower logs and ELK logs to analyze task statuses and errors.
+
+## Key Components
+
+### **Function: `get_elk_tower_logs(cls, task_start_time)`**
+- **Purpose:** Fetches logs from the ELK system for Ansible Tower tasks.
+- **Parameters:**
+  - `cls`: Class reference to access log utilities.
+  - `task_start_time`: Start time of the task to search for logs.
+- **Returns:** Logs retrieved from ELK.
+
+### **Function: `parse_task_logs(log)`**
+- **Purpose:** Parses log data to find task execution details.
+- **Parameters:**
+  - `log`: String containing log data.
+- **Returns:** Parsed details such as task status and execution time.
+
+### **Function: `main()`**
+- **Purpose:** Demonstrates the usage of the script for log processing.
+- **Process:**
+  - Retrieves logs for a sample task.
+  - Parses the logs to extract relevant details.
+
+## Usage Instructions
+1. Call `get_elk_tower_logs` to retrieve logs for a task.
+2. Use `parse_task_logs` to extract specific details from the logs.
+
+## Dependencies
+- Python modules: `requests`, `datetime`.
+

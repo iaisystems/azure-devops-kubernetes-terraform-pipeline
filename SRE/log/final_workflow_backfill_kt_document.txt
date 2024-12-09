@@ -1,0 +1,25 @@
+
+# KT Document: Workflow Backfill Script
+
+## Purpose
+This script is designed to process workflows and identify gaps in their execution history. Missing workflows are backfilled using task data.
+
+## Key Components
+1. **Class: `LeapBackfill`**
+   - Handles the identification of missing workflows and triggers backfill tasks.
+   - Functions:
+     - `get_start_task_time_in_task_history`: Retrieves the start time of a workflow task.
+     - `get_task_success_end_time_in_task_history`: Retrieves the end time of a successful task.
+     - `find_leapp_missing_and_backfill`: Identifies and resolves missing workflows.
+
+2. **Class: `Day2IssueForBackfill`**
+   - Represents workflow issues to be saved during the backfill process.
+   - Functions:
+     - `save`: Saves the backfill issue to a database or model.
+
+## Dependencies
+- Python modules: `logging`, `datetime`, `dateutil`.
+
+## Usage Instructions
+1. Instantiate `LeapBackfill` with relevant parameters.
+2. Call `find_leapp_missing_and_backfill` to identify and resolve missing workflows.

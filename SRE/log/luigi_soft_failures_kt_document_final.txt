@@ -1,0 +1,24 @@
+
+# KT Document: Luigi Soft Failure Handling Script
+
+## Purpose
+This script provides a mechanism to allow Luigi tasks to fail softly, enabling smoother workflow management without abrupt failures.
+
+## Key Components
+1. **`dataloader_softly_failing` Class**
+   - A decorator to handle exceptions gracefully in Luigi tasks.
+   - Supports propagating failures and logging failure details.
+
+2. **`SoftFailureTarget` Class**
+   - Handles failure reports for Luigi tasks.
+   - Provides methods to manage and propagate failure messages.
+
+## Usage Instructions
+1. Use the `@dataloader_softly_failing` decorator on Luigi tasks.
+2. Configure the parameters (`catch_all`, `propagate`, `output_dir`) as needed.
+3. Implement task logic in the `run` method.
+
+## Dependencies
+- Python modules: `luigi`, `traceback`, `os`.
+- Custom modules: `luigi_soft_failures.config`, `luigi_soft_failures.utils`.
+

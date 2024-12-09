@@ -1,0 +1,28 @@
+
+# KT Document: BasePipe Class for List Processing
+
+## Purpose
+- The `BasePipe` class simplifies list operations like sorting, filtering, and mapping.
+- The `main` function demonstrates the use of this class with a sample data set.
+
+## Key Components
+1. **Class: `BasePipe`**
+   - **`sorted(self, key, reverse)`**: Re-sorts the data based on a key or in reverse order.
+   - **`filter(self, f)`**: Filters data based on a function `f`.
+   - **`map(self, f)`**: Maps a function `f` to all elements.
+   - **`get_top(self)`**: Retrieves the first element.
+   - **`find_first(self, f)`**: Finds the first element matching a condition.
+   - **`find_last(self, f)`**: Finds the last element matching a condition.
+
+2. **Function: `main`**
+   - Demonstrates:
+     - Filtering a list of dictionaries.
+     - Finding the first and last matches based on a condition.
+
+## Dependencies
+- Python 3.x
+- A list-like input for the `BasePipe` class.
+
+## Usage Instructions
+1. Replace `optimus_history` with your data set.
+2. Use the `BasePipe` class to process your data with various operations.

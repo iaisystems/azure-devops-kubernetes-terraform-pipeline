@@ -1,0 +1,67 @@
+
+# KT Document: Date and Time Utility Functions
+
+## Purpose
+This script provides utility functions to handle conversions between various date and time formats, such as ISO 8601, Unix timestamps (seconds/milliseconds), and Python `datetime` objects.
+
+## Key Components
+
+### **Function: `json_serial(obj)`**
+- **Purpose:** Serializes `datetime` or `date` objects into JSON-compatible strings.
+- **Parameters:**
+  - `obj`: Object to serialize.
+- **Returns:** An ISO 8601 string if `obj` is a `datetime` or `date` instance.
+- **Raises:** A `TypeError` if the object is not serializable.
+
+### **Function: `iso8601_to_timestamp(datetime_string)`**
+- **Purpose:** Converts an ISO 8601 string to a Unix timestamp in seconds.
+- **Parameters:**
+  - `datetime_string`: ISO 8601 formatted string.
+- **Returns:** The Unix timestamp in seconds.
+
+### **Function: `iso8601_to_millisec(datetime_string)`**
+- **Purpose:** Converts an ISO 8601 string to a Unix timestamp in milliseconds.
+- **Parameters:**
+  - `datetime_string`: ISO 8601 formatted string.
+- **Returns:** The Unix timestamp in milliseconds.
+
+### **Function: `millisec_to_iso8602_utc(millisec)`**
+- **Purpose:** Converts a Unix timestamp in milliseconds to an ISO 8602 UTC string.
+- **Parameters:**
+  - `millisec`: Timestamp in milliseconds.
+- **Returns:** An ISO 8602 UTC formatted string.
+
+### **Function: `iso8601_to_datetime(when, tz=pytz.UTC)`**
+- **Purpose:** Converts an ISO 8601 string to a Python `datetime` object.
+- **Parameters:**
+  - `when`: ISO 8601 formatted string.
+  - `tz`: The target timezone (default: UTC).
+- **Returns:** A timezone-aware `datetime` object.
+
+### **Function: `datetime_to_iso8601(when, tz=pytz.UTC)`**
+- **Purpose:** Converts a `datetime` object to an ISO 8601 string.
+- **Parameters:**
+  - `when`: A `datetime` object.
+  - `tz`: The target timezone (default: UTC).
+- **Returns:** A formatted ISO 8601 string.
+
+### **Function: `millisec_to_datetime(when, tz=pytz.UTC)`**
+- **Purpose:** Converts a Unix timestamp in milliseconds to a `datetime` object.
+- **Parameters:**
+  - `when`: Timestamp in milliseconds.
+  - `tz`: The target timezone (default: UTC).
+- **Returns:** A timezone-aware `datetime` object.
+
+### **Function: `datetime_to_string(date_time)`**
+- **Purpose:** Converts a `datetime` object to a formatted string.
+- **Parameters:**
+  - `date_time`: A `datetime` object.
+- **Returns:** A string formatted as `"%Y-%m-%dT%H:%M:%S.%f%z"`.
+
+## Usage Instructions
+1. Use the functions to handle various date and time conversions as required.
+2. Replace the sample data in the `main()` function with your own test cases.
+
+## Dependencies
+- Python modules: `datetime`, `pytz`, `dateutil`.
+

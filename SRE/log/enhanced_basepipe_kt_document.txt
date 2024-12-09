@@ -1,0 +1,54 @@
+
+# KT Document: BasePipe Utility Class
+
+## Purpose
+This script defines the `BasePipe` class, a wrapper to process lists with common operations such as filtering, mapping, and finding elements.
+
+## Key Components
+
+### **Class: `BasePipe`**
+- **Purpose:** Provides utilities to process lists with chainable methods.
+
+#### **`__init__`**
+- **Purpose:** Initializes a `BasePipe` object.
+- **Parameters:**
+  - `input`: List of data to process.
+  - `key`: Sorting key for the input list.
+  - `reverse`: Boolean indicating whether to sort in reverse order.
+
+#### **`filter(f)`**
+- **Purpose:** Filters the list based on a condition.
+- **Parameters:**
+  - `f`: A function that returns `True` for elements to include.
+- **Returns:** A new `BasePipe` instance with filtered elements.
+
+#### **`map(f)`**
+- **Purpose:** Applies a function to each element of the list.
+- **Parameters:**
+  - `f`: A function to apply.
+- **Returns:** A new `BasePipe` instance with transformed elements.
+
+#### **`get_top()`**
+- **Purpose:** Retrieves the first element of the list.
+- **Returns:** The first element or `None` if the list is empty.
+
+#### **`find_first(f)`**
+- **Purpose:** Finds the first element satisfying a condition.
+- **Parameters:**
+  - `f`: A function that returns `True` for the desired element.
+- **Returns:** The first matching element or `None`.
+
+#### **`find_last(f)`**
+- **Purpose:** Finds the last element satisfying a condition.
+- **Parameters:**
+  - `f`: A function that returns `True` for the desired element.
+- **Returns:** The last matching element or `None`.
+
+#### **`__iter__`**
+- **Purpose:** Iterates through the data.
+- **Returns:** An iterator for the list.
+
+## Usage Instructions
+1. Initialize a `BasePipe` object with a list.
+2. Chain methods like `filter`, `map`, and `find_first` to process the data.
+

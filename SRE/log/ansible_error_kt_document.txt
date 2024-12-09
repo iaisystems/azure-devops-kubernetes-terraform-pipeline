@@ -1,0 +1,46 @@
+
+# KT Document: Python Script for Parsing Ansible Errors from ELK Logs
+
+## Purpose
+- This script is designed to identify and debug Ansible job failures by interacting with the ELK stack.
+- It automates log retrieval, parsing, and error detection for faster troubleshooting.
+
+## Modules/Functions Overview
+1. **`get_ansible_error(url)`**
+   - Fetches Ansible error logs from a given URL.
+   - Identifies and returns fatal errors found in the logs.
+
+2. **`get_ansible_error_from_elk(desc, task_start_time)`**
+   - Parses the job description to extract the Ansible job number.
+   - Fetches associated ELK logs for error detection.
+
+3. **`is_ansible_error(log)`**
+   - Extracts the Ansible job number from a log URL.
+   - Returns the job number for further analysis.
+
+4. **`get_elk_errorlog(job, start_time)`**
+   - Fetches ELK logs for a specific Ansible job.
+   - Handles time formatting for accurate queries.
+
+5. **`get_elk_towerlog(cls, job)`**
+   - Searches the ELK stack for specific tower logs related to an Ansible job.
+
+6. **`main()`**
+   - Demonstrates the workflow by:
+     - Parsing a description log for Ansible job numbers.
+     - Fetching and analyzing the corresponding ELK logs.
+
+## Dependencies
+- Python modules: `logging`, `datetime`.
+- Connection to an ELK stack instance.
+- Log description format for job identification.
+
+## Inputs and Outputs
+- **Input**: Log descriptions, job numbers, and query parameters for ELK.
+- **Output**: Parsed logs, error messages, or job IDs.
+
+## Usage Instructions
+1. Update the `desc` variable with your log details in the `main()` function.
+2. Replace the `dummy_error_log` and `mocked_response` placeholders with actual logic.
+3. Run the script to identify errors and debug Ansible jobs.
+

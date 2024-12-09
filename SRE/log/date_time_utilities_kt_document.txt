@@ -1,0 +1,23 @@
+
+# KT Document: Date and Time Utility Functions
+
+## Purpose
+This script provides utility functions to convert between various date and time formats, such as ISO 8601, Unix timestamps (seconds/milliseconds), and Python `datetime` objects.
+
+## Key Functions
+1. **`json_serial(obj)`**: Serializes `datetime` objects to JSON-compatible strings.
+2. **`iso8601_to_timestamp(datetime_string)`**: Converts ISO 8601 strings to Unix timestamps in seconds.
+3. **`iso8601_to_millisec(datetime_string)`**: Converts ISO 8601 strings to Unix timestamps in milliseconds.
+4. **`millisec_to_iso8602_utc(millisec)`**: Converts milliseconds to ISO 8602 UTC strings.
+5. **`iso8601_to_datetime(when, tz=pytz.UTC)`**: Converts ISO 8601 strings to `datetime` objects.
+6. **`datetime_to_iso8601(when, tz=pytz.UTC)`**: Converts `datetime` objects to ISO 8601 strings.
+7. **`millisec_to_datetime(when, tz=pytz.UTC)`**: Converts milliseconds to `datetime` objects.
+8. **`datetime_to_string(date_time)`**: Converts `datetime` objects to formatted strings.
+
+## Dependencies
+- Python modules: `datetime`, `pytz`, `dateutil`.
+
+## Usage Instructions
+1. Use the functions to handle date and time conversions as per your requirements.
+2. Replace the sample data in the `main()` function with your own test cases.
+
