@@ -57,3 +57,4 @@ class MapAitCount(luigi.Task):
 
         with self.output().open('w') as outfile:
             outfile.write(json.dumps(done, default=str))
+ok
