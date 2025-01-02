@@ -1,0 +1,59 @@
+Code Explanation
+Imports:
+
+The code imports luigi for defining tasks.
+MongoDB and Elasticsearch libraries are used to interact with respective databases.
+Configuration:
+
+Database configurations (ESConf and MDBConf) are read to connect with MongoDB and Elasticsearch.
+Classes:
+
+GetAitList:
+Retrieves AIT-related data from MongoDB and writes it into a JSON file.
+GetMemberList:
+Fetches member details and outputs them into a JSON file.
+MapRolesAitTask:
+Maps roles to AITs by processing the outputs of GetAitList and GetMemberList.
+VMCountByAit:
+Retrieves data from Elasticsearch to calculate active, inactive, and deleted virtual machines by AIT.
+MapAitCount:
+Counts roles and maps AIT names with the final aggregated counts.
+
+
+
+class MapAitCount(luigi.Task):
+    timestamp = luigi.IntParameter()
+
+    def output(self):
+        return luigi.LocalTarget(f'corpora/roles-{self.timestamp}/roles_count.json')
+
+    def requires(self):
+        return {
+            'roles': MapRolesAitTask(timestamp=self.timestamp),
+            'counts': VMCountByAit(timestamp=self.timestamp)
+        }
+
+    def run(self):
+        init_count = dict(activeLBCount=0, activeVMCount=0, deletedVMCount=0)
+
+        with self.input()['roles'].open('r') as fs:
+            roles = json.load(fs)
+
+        with self.input()['counts'].open('r') as fs:
+            counts = json.load(fs)
+
+        done = []
+
+        for role in roles:
+            ait_number = role['aitNumber']
+            if ait_number not in done:
+                counts.get(ait_number, init_count)
+                done.append(ait_number)
+
+                # Print the AIT name
+                print(f"AIT Name: {ait_number}")
+
+        print("Completed processing AIT Names.")
+
+        with self.output().open('w') as outfile:
+            outfile.write(json.dumps(done, default=str))
