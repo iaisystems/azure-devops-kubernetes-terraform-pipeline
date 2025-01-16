@@ -1,0 +1,73 @@
+import requests
+import json
+
+# Elasticsearch URLs for UAT and PROD
+uat_url = "http://uat-elasticsearch-url:9200/mongodb_roles/_search"
+prod_url = "http://prod-elasticsearch-url:9200/mongodb_roles/_search"
+
+# Elasticsearch query to fetch limited results
+query = {
+    "size": 100,  # Limit the size of the response
+    "query": {
+        "match_all": {}
+    }
+}
+
+# Elasticsearch authentication (if required)
+auth = ('username', 'password')  # Replace with your credentials, if needed
+
+# Function to fetch data from Elasticsearch
+def fetch_data(url, query):
+    response = requests.post(url, json=query, auth=auth)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f"Failed to fetch data from {url}. Status Code: {response.status_code}")
+        return None
+
+# Fetch data from UAT and PROD
+uat_data = fetch_data(uat_url, query)
+prod_data = fetch_data(prod_url, query)
+
+if uat_data and prod_data:
+    # Parse hits from UAT and PROD data
+    uat_docs = {doc['_id']: doc['_source'] for doc in uat_data['hits']['hits']}
+    prod_docs = {doc['_id']: doc['_source'] for doc in prod_data['hits']['hits']}
+
+    # Compare documents between UAT and PROD
+    differences = []
+    for doc_id in uat_docs:
+        if doc_id in prod_docs:
+            uat_doc = uat_docs[doc_id]
+            prod_doc = prod_docs[doc_id]
+            
+            # Compare fields in each document
+            for field in uat_doc:
+                if field in prod_doc:
+                    if uat_doc[field] != prod_doc[field]:
+                        differences.append({
+                            "doc_id": doc_id,
+                            "field": field,
+                            "uat_value": uat_doc[field],
+                            "prod_value": prod_doc[field]
+                        })
+                else:
+                    differences.append({
+                        "doc_id": doc_id,
+                        "field": field,
+                        "uat_value": uat_doc[field],
+                        "prod_value": "Field missing in PROD"
+                    })
+        else:
+            differences.append({
+                "doc_id": doc_id,
+                "message": "Document missing in PROD"
+            })
+
+    # Save differences to a file
+    with open('field_differences.json', 'w') as diff_file:
+        json.dump(differences, diff_file, indent=4)
+
+    print("Comparison complete. Differences saved to 'field_differences.json'.")
+else:
+    print("Failed to fetch data from one or both environments.")
