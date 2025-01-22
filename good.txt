@@ -1,0 +1,34 @@
+import requests
+import json
+
+# Elasticsearch endpoint
+url = "http://cloud-elasticsearch-uat.bankofamerica.com/6b296c90-d386-11ef-a39e-9d5b540269/_search"
+
+# Query payload with size limit
+query = {
+    "size": 1,  # Limit to 1 result
+    "query": {
+        "match_phrase": {
+            "aitNumber": "73043"
+        }
+    },
+    "sort": [
+        {
+            "lastModifiedDate": {
+                "order": "desc"
+            }
+        }
+    ]
+}
+
+# Headers
+headers = {"Content-Type": "application/json"}
+
+# Make the request
+response = requests.get(url, headers=headers, json=query)
+
+# Save the response to a JSON file
+with open("response.json", "w") as file:
+    json.dump(response.json(), file)
+
+print("Response saved to response.json")
