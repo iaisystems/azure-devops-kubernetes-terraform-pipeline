@@ -1,47 +1,36 @@
-import pandas as pd
 import json
 
-# Define the fields to compare
-fields_to_compare = ["lastmodifiedDate", "roleid"]
-
-# Define additional fields to include in the report
-additional_fields = ["name", "email", "status", "Nooffailures", "Noofuser", "Anyerror"]  # Add or remove fields as needed
-
-# Define conditions for filtering
-conditions = {
-    "Nooffailures": 0,          # Nooffailures should be 0
-    "Noofuser": "NA",           # Noofuser should be "NA"
-    "Anyerror": "",             # Anyerror should be empty
-}
-
 # Load JSON data from files
-with open('file1.json', 'r') as f1, open('file2.json', 'r') as f2:
+with open("response_prod.json", "r", encoding="utf-8") as f1, open("response_uat.json", "r", encoding="utf-8") as f2:
     data1 = json.load(f1)
     data2 = json.load(f2)
 
-# Convert JSON data to pandas DataFrames
-df1 = pd.DataFrame(data1)
-df2 = pd.DataFrame(data2)
+# Extract actual records from the Elasticsearch response
+data1_records = data1.get("hits", {}).get("hits", [])
+data2_records = data2.get("hits", {}).get("hits", [])
 
-# Merge DataFrames on the specified fields
-merged_df = pd.merge(df1, df2, on=fields_to_compare, how='inner')
+# Function to compare records based on lastModifiedDate and roleId
+def compare_records(record1, record2):
+    # Extract the _source field if present
+    record1 = record1.get("_source", {}) if isinstance(record1, dict) else {}
+    record2 = record2.get("_source", {}) if isinstance(record2, dict) else {}
 
-# Select only the fields you want in the report
-report_fields = fields_to_compare + additional_fields
-report_df = merged_df[report_fields]
+    return (
+        record1.get("lastModifiedDate") == record2.get("lastModifiedDate") and
+        record1.get("roleId") == record2.get("roleId")
+    )
 
-# Apply filtering conditions
-filtered_df = report_df.copy()
-for field, value in conditions.items():
-    if field in filtered_df.columns:
-        if pd.isna(value):  # Handle NA/NaN values
-            filtered_df = filtered_df[filtered_df[field].isna()]
-        elif value == "":   # Handle empty strings
-            filtered_df = filtered_df[filtered_df[field] == ""]
-        else:               # Handle exact matches
-            filtered_df = filtered_df[filtered_df[field] == value]
+# Iterate through records and compare
+matches = []
+for record1 in data1_records:
+    for record2 in data2_records:
+        if compare_records(record1, record2):
+            matches.append(record1["_source"])  # Store the matched records
 
-# Save the filtered matching records to an Excel file
-filtered_df.to_excel('filtered_matching_records.xlsx', index=False)
-
-print("Filtered matching records have been saved to 'filtered_matching_records.xlsx'.")
+# Print matching records
+if matches:
+    print("\n✅ Matching Records Found:\n")
+    for match in matches:
+        print(json.dumps(match, indent=4))
+else:
+    print("\n❌ No matching records found!")
