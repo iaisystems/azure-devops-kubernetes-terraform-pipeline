@@ -1,17 +1,24 @@
 import json
 
-# Load JSON data from files
-with open("response_prod.json", "r", encoding="utf-8") as f1, open("response_uat.json", "r", encoding="utf-8") as f2:
-    data1 = json.load(f1)
-    data2 = json.load(f2)
+# Load JSON data from two Elasticsearch responses
+def load_json(filename):
+    with open(filename, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-# Extract actual records from the Elasticsearch response
+# Replace these with your actual file names
+file1 = "response_prod.json"  
+file2 = "response_uat.json"   
+
+# Load JSON files
+data1 = load_json(file1)
+data2 = load_json(file2)
+
+# Extract the records from 'hits' -> 'hits'
 data1_records = data1.get("hits", {}).get("hits", [])
 data2_records = data2.get("hits", {}).get("hits", [])
 
-# Function to compare records based on lastModifiedDate and roleId
+# Function to compare records
 def compare_records(record1, record2):
-    # Extract the _source field if present
     record1 = record1.get("_source", {}) if isinstance(record1, dict) else {}
     record2 = record2.get("_source", {}) if isinstance(record2, dict) else {}
 
@@ -20,17 +27,30 @@ def compare_records(record1, record2):
         record1.get("roleId") == record2.get("roleId")
     )
 
-# Iterate through records and compare
-matches = []
-for record1 in data1_records:
-    for record2 in data2_records:
-        if compare_records(record1, record2):
-            matches.append(record1["_source"])  # Store the matched records
+# Create two separate sections
+matches_from_prod = {}
+matches_from_uat = {}
 
-# Print matching records
-if matches:
-    print("\n✅ Matching Records Found:\n")
-    for match in matches:
-        print(json.dumps(match, indent=4))
-else:
-    print("\n❌ No matching records found!")
+# Compare and group results
+for rec1 in data1_records:
+    rec1_source = rec1.get("_source", {})
+    matches_from_prod[str(rec1_source)] = [
+        rec2["_source"] for rec2 in data2_records if compare_records(rec1, rec2)
+    ]
+
+for rec2 in data2_records:
+    rec2_source = rec2.get("_source", {})
+    matches_from_uat[str(rec2_source)] = [
+        rec1["_source"] for rec1 in data1_records if compare_records(rec1, rec2)
+    ]
+
+# Print output in two separate sections
+print("\n==============================")
+print("🔹 Matches for Each Record from response_prod.json")
+print("==============================\n")
+print(json.dumps(matches_from_prod, indent=4))
+
+print("\n==============================")
+print("🔹 Matches for Each Record from response_uat.json")
+print("==============================\n")
+print(json.dumps(matches_from_uat, indent=4))
