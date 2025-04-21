@@ -1,60 +1,35 @@
+from elasticsearch import Elasticsearch
+import config
 import requests
-import json
 
-# URLs for UAT and PROD
-uat_url = "http://uat-kibana-url.com/app/discover#/?g=(filters:!(),...)"
-prod_url = "http://prod-kibana-url.com/app/discover#/?g=(filters:!(),...)"
+# --- Step 1: Get Access Token ---
+token_url = f"https://{config.token_base_url}/oauth2/token"
+token_response = requests.post(token_url, data={
+    "grant_type": "client_credentials",
+    "client_id": config.client_id,
+    "client_secret": config.client_secret
+})
 
-# Function to fetch data from the URL
-def fetch_data(url):
-    headers = {"Content-Type": "application/json"}
-    try:
-        response = requests.get(url, headers=headers)
-        if response.status_code == 200:
-            return response.json()  # Adjust parsing depending on Kibana response
-        else:
-            print(f"Failed to fetch data from {url}. Status code: {response.status_code}")
-            return None
-    except Exception as e:
-        print(f"Error fetching data: {e}")
-        return None
+access_token = token_response.json().get("access_token")
 
-# Fetch data from UAT and PROD
-uat_data = fetch_data(uat_url)
-prod_data = fetch_data(prod_url)
+# --- Step 2: Connect to Elasticsearch ---
+es = Elasticsearch(
+    "https://your-elasticsearch-url.com",  # Replace with your actual ELK endpoint
+    headers={"Authorization": f"Bearer {access_token}"}
+)
 
-# Compare data if both responses are successful
-if uat_data and prod_data:
-    # Assuming 'hits' contains the document data in Elasticsearch responses
-    uat_docs = {doc["_id"]: doc["_source"] for doc in uat_data["hits"]["hits"]}
-    prod_docs = {doc["_id"]: doc["_source"] for doc in prod_data["hits"]["hits"]}
+# --- Step 3: Search and Fetch Only Required Fields ---
+query = {
+    "_source": ["a", "b", "c", "d"],  # This ensures only the needed fields are returned
+    "query": {
+        "match_all": {}
+    }
+}
 
-    differences = []
+response = es.search(index="bmp_issues", body=query, size=100)
 
-    # Compare documents
-    for doc_id, uat_doc in uat_docs.items():
-        prod_doc = prod_docs.get(doc_id)
-        if prod_doc:
-            # Compare each field
-            for field, uat_value in uat_doc.items():
-                prod_value = prod_doc.get(field, None)
-                if uat_value != prod_value:
-                    differences.append({
-                        "doc_id": doc_id,
-                        "field": field,
-                        "uat_value": uat_value,
-                        "prod_value": prod_value
-                    })
-        else:
-            differences.append({
-                "doc_id": doc_id,
-                "message": "Document missing in PROD"
-            })
-
-    # Save differences to a JSON file
-    with open("field_differences.json", "w") as diff_file:
-        json.dump(differences, diff_file, indent=4)
-
-    print("Comparison complete. Differences saved to 'field_differences.json'.")
-else:
-    print("Failed to fetch data from one or both environments.")
+# --- Step 4: Print Each Document's Selected Fields ---
+print("Results:")
+for hit in response["hits"]["hits"]:
+    doc = hit["_source"]
+    print(f"a: {doc.get('a')}, b: {doc.get('b')}, c: {doc.get('c')}, d: {doc.get('d')}")
