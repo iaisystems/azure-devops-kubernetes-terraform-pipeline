@@ -3,18 +3,43 @@ from flask_restx import Api, Resource, fields
 from elasticsearch import Elasticsearch
 
 app = Flask(__name__)
-api = Api(app, version='1.0', title='ELK Index Reader API',
-          description='API to read Elasticsearch index data')
+api = Api(app, version='1.0', title='ELK BMP Issue API',
+          description='API to search, manage, and deduplicate BMP issues in Elasticsearch')
 
 ns = api.namespace('elk', description='Operations on Elasticsearch')
 
+# Elasticsearch client
+es = Elasticsearch("http://localhost:9200")
+
+# Models
 elk_query_model = api.model('ELKQuery', {
-    'index': fields.String(required=True, description='Index name'),
-    'query': fields.Raw(required=False, description='Optional ES query (match_all by default)')
+    'index': fields.String(required=True),
+    'query': fields.Raw(required=False)
 })
 
-# Initialize Elasticsearch client
-es = Elasticsearch("http://localhost:9200")  # Change to your ELK host and port
+bmp_issue_query_model = api.model('BMPIssueQuery', {
+    'index': fields.String(required=True),
+    'issuecategory': fields.String(required=False),
+    'issuedescription': fields.String(required=False),
+    'issuesamplelog': fields.String(required=False),
+    'project': fields.String(required=False)
+})
+
+bmp_delete_model = api.model('BMPDeleteByText', {
+    'index': fields.String(required=True),
+    'issuetextfilter': fields.String(required=True)
+})
+
+bmp_duplicate_check_model = api.model('BMPDuplicateCheck', {
+    'index': fields.String(required=True),
+    'issuetextfilter': fields.String(required=True),
+    'action': fields.String(required=True, description="insert | update | delete | abort"),
+    'issuecategory': fields.String(),
+    'issuedescription': fields.String(),
+    'issuesamplelog': fields.String(),
+    'project': fields.String()
+})
+
 
 @ns.route('/search')
 class ELKSearch(Resource):
@@ -33,6 +58,107 @@ class ELKSearch(Resource):
             return {"hits": result['hits']['hits']}, 200
         except Exception as e:
             return {"error": str(e)}, 500
+
+
+@ns.route('/bmp-issue/delete-by-text')
+class BMPDeleteByText(Resource):
+    @ns.expect(bmp_delete_model)
+    def post(self):
+        """Delete documents in index where any field contains the issuetextfilter"""
+        payload = api.payload
+        index = payload.get('index')
+        text_filter = payload.get('issuetextfilter')
+
+        try:
+            if not es.indices.exists(index=index):
+                return {"error": f"Index '{index}' not found"}, 404
+
+            result = es.search(index=index, query={
+                "query_string": {"query": f"*{text_filter}*"}
+            }, size=1000)
+
+            deleted = []
+            for hit in result['hits']['hits']:
+                doc_id = hit['_id']
+                es.delete(index=index, id=doc_id)
+                deleted.append(doc_id)
+
+            return {
+                "deleted_count": len(deleted),
+                "deleted_ids": deleted
+            }, 200
+
+        except Exception as e:
+            return {"error": str(e)}, 500
+
+
+@ns.route('/bmp-issue/check-duplicate')
+class BMPCheckDuplicate(Resource):
+    @ns.expect(bmp_duplicate_check_model)
+    def post(self):
+        """Check if an issue already exists using issuetextfilter, and insert/update/delete accordingly"""
+        payload = api.payload
+        index = payload['index']
+        text_filter = payload['issuetextfilter']
+        action = payload['action']
+
+        try:
+            if not es.indices.exists(index=index):
+                return {"error": f"Index '{index}' not found"}, 404
+
+            # Step 1: Search for duplicate
+            result = es.search(index=index, query={
+                "query_string": {"query": f"*{text_filter}*"}
+            }, size=1)
+
+            if result['hits']['hits']:
+                # Duplicate found
+                existing = result['hits']['hits'][0]
+                doc_id = existing['_id']
+
+                if action == 'update':
+                    update_body = {
+                        "doc": {
+                            "issuecategory": payload.get('issuecategory'),
+                            "issuedescription": payload.get('issuedescription'),
+                            "issuesamplelog": payload.get('issuesamplelog'),
+                            "project": payload.get('project')
+                        }
+                    }
+                    es.update(index=index, id=doc_id, body=update_body)
+                    return {"status": "updated", "id": doc_id}, 200
+
+                elif action == 'delete':
+                    es.delete(index=index, id=doc_id)
+                    return {"status": "deleted", "id": doc_id}, 200
+
+                elif action == 'abort':
+                    return {"status": "aborted", "id": doc_id}, 200
+
+                else:
+                    return {"status": "duplicate found", "id": doc_id, "action_needed": "choose update/delete/abort"}, 409
+
+            else:
+                # No duplicate
+                if action == 'insert':
+                    doc = {
+                        "issuecategory": payload.get('issuecategory'),
+                        "issuedescription": payload.get('issuedescription'),
+                        "issuesamplelog": payload.get('issuesamplelog'),
+                        "project": payload.get('project')
+                    }
+                    inserted = es.index(index=index, document=doc)
+                    return {"status": "inserted", "id": inserted['_id']}, 201
+
+                elif action == 'abort':
+                    return {"status": "aborted - no duplicate found"}, 200
+
+                else:
+                    return {"status": "no duplicate found", "action_needed": "choose insert/abort"}, 404
+
+        except Exception as e:
+            return {"error": str(e)}, 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
