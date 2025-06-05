@@ -1,56 +1,38 @@
-import json
+from flask import Flask, request
+from flask_restx import Api, Resource, fields
+from elasticsearch import Elasticsearch
 
-# Load JSON data from two Elasticsearch responses
-def load_json(filename):
-    with open(filename, "r", encoding="utf-8") as f:
-        return json.load(f)
+app = Flask(__name__)
+api = Api(app, version='1.0', title='ELK Index Reader API',
+          description='API to read Elasticsearch index data')
 
-# Replace these with your actual file names
-file1 = "response_prod.json"  
-file2 = "response_uat.json"   
+ns = api.namespace('elk', description='Operations on Elasticsearch')
 
-# Load JSON files
-data1 = load_json(file1)
-data2 = load_json(file2)
+elk_query_model = api.model('ELKQuery', {
+    'index': fields.String(required=True, description='Index name'),
+    'query': fields.Raw(required=False, description='Optional ES query (match_all by default)')
+})
 
-# Extract the records from 'hits' -> 'hits'
-data1_records = data1.get("hits", {}).get("hits", [])
-data2_records = data2.get("hits", {}).get("hits", [])
+# Initialize Elasticsearch client
+es = Elasticsearch("http://localhost:9200")  # Change to your ELK host and port
 
-# Function to compare records
-def compare_records(record1, record2):
-    record1 = record1.get("_source", {}) if isinstance(record1, dict) else {}
-    record2 = record2.get("_source", {}) if isinstance(record2, dict) else {}
+@ns.route('/search')
+class ELKSearch(Resource):
+    @ns.expect(elk_query_model)
+    def post(self):
+        """Search documents in a specific index"""
+        payload = api.payload
+        index = payload.get('index')
+        query = payload.get('query', {"match_all": {}})
 
-    return (
-        record1.get("lastModifiedDate") == record2.get("lastModifiedDate") and
-        record1.get("roleId") == record2.get("roleId")
-    )
+        try:
+            if not es.indices.exists(index=index):
+                return {"error": f"Index '{index}' not found"}, 404
 
-# Create two separate sections
-matches_from_prod = {}
-matches_from_uat = {}
+            result = es.search(index=index, query=query)
+            return {"hits": result['hits']['hits']}, 200
+        except Exception as e:
+            return {"error": str(e)}, 500
 
-# Compare and group results
-for rec1 in data1_records:
-    rec1_source = rec1.get("_source", {})
-    matches_from_prod[str(rec1_source)] = [
-        rec2["_source"] for rec2 in data2_records if compare_records(rec1, rec2)
-    ]
-
-for rec2 in data2_records:
-    rec2_source = rec2.get("_source", {})
-    matches_from_uat[str(rec2_source)] = [
-        rec1["_source"] for rec1 in data1_records if compare_records(rec1, rec2)
-    ]
-
-# Print output in two separate sections
-print("\n==============================")
-print("🔹 Matches for Each Record from response_prod.json")
-print("==============================\n")
-print(json.dumps(matches_from_prod, indent=4))
-
-print("\n==============================")
-print("🔹 Matches for Each Record from response_uat.json")
-print("==============================\n")
-print(json.dumps(matches_from_uat, indent=4))
+if __name__ == '__main__':
+    app.run(debug=True)
