@@ -1,1 +1,40 @@
-df
+def is_duplicate_or_insert(issue_filter_text: str, index_name: str, full_doc: dict) -> dict:
+    try:
+        if not es.indices.exists(index=index_name):
+            return {"status": "error", "message": "Index does not exist"}
+
+        # Search for exact match
+        scan_results = helpers.scan(
+            client=es,
+            index=index_name,
+            query={
+                "query": {
+                    "term": {
+                        "issueFilterText.keyword": issue_filter_text
+                    }
+                }
+            },
+            size=1
+        )
+
+        for doc in scan_results:
+            return {
+                "status": "duplicate found",
+                "id": doc['_id'],
+                "matched_text": doc['_source'].get('issueFilterText')
+            }
+
+        # No match found → insert with new numeric ID
+        new_id = get_max_id(index_name) + 1
+        full_doc['issueFilterText'] = issue_filter_text
+        full_doc['created_at'] = datetime.utcnow().isoformat()
+
+        result = es.index(index=index_name, id=new_id, document=full_doc)
+        return {
+            "status": "inserted",
+            "id": new_id,
+            "inserted_text": issue_filter_text
+        }
+
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
